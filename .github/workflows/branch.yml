@@ -1,0 +1,44 @@
+name: Create Branch for New Issue
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Pull latest changes from develop
+        run: |
+          git pull origin develop
+
+      - name: Create new branch
+        run: |
+          ISSUE_TITLE=${{ github.event.issue.title }}
+          BRANCH_NAME=${{ github.event.issue.title }}
+          git checkout -b $BRANCH_NAME
+          git pull origin develop
+          git push origin $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Comment on issue
+        run: |
+          ISSUE_NUMBER=${{ github.event.issue.number }}
+          BRANCH_NAME=${{ github.event.issue.title }}
+          curl -X POST -H "Authorization: token ${{ github.token }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments \
+            -d "{\"body\": \"Branch created: $BRANCH_NAME\"}"
