@@ -1,0 +1,68 @@
+networks:
+  app-network:
+    driver: bridge
+services:
+  my-service-production:
+    container_name: livestock-manager-api 
+    build:
+      target: production
+      context: .
+      args:
+        NODE_VERSION: 20-alpine3.18
+        DUMB_INIT_VERSION: 1.2.5-r2
+        PORT: ${PORT:-3000}
+    ports:
+      - '80:${PORT:-3000}'
+    env_file: ./.env
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
+    networks:
+      - app-network
+  my-service-dev:
+    container_name: livestock-manager-api 
+    restart: unless-stopped
+    build:
+      target: dev
+      context: .
+      args:
+        NODE_VERSION: 20-alpine3.18
+        DUMB_INIT_VERSION: 1.2.5-r2
+        PORT: ${PORT:-3000}
+    ports:
+      - '80:${PORT:-3000}'
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - db-dev
+    env_file: ./.env
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
+    networks:
+      - app-network
+  db-dev:
+    container_name: db-dev
+    image: postgres:14.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_DEV:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DEV:-root}
+      POSTGRES_DB: ${POSTGRES_DB_DEV:-development_db}
+    ports:
+      - '5434:5432'
+    volumes:
+      - db-data-dev:/var/lib/postgresql/data
+    networks:
+      - app-network
+volumes:
+  db-data-dev:
