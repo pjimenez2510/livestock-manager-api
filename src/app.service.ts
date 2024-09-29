@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
   getHello(): string {
-    throw new UnauthorizedException('Hola error')
+    return 'Hello World!';
   }
 }
