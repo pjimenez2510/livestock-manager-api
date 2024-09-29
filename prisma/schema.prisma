@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Purpose {
+  MILK
+  MEAT
+  DUAL_PURPOSE
+}
+
+enum StatusGestation {
+  IN_PROGRESS
+  SUCCESSFUL
+  ABORTION
+}
+
+enum StatusEvent {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  username  String    @unique
+  password  String
+  role      Role
+  email     String
+  phone     String
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  livestock   Livestock? @relation(fields: [livestockId], references: [id])
+  livestockId Int?
+
+  @@map("users")
+}
+
+model Livestock {
+  id        Int       @id @default(autoincrement())
+  name      String
+  address   String
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+  users     User[]
+  farms     Farm[]
+  vaccines  Vaccine[]
+
+  @@map("livestocks")
+}
+
+model Farm {
+  id        Int       @id @default(autoincrement())
+  name      String
+  purpose   Purpose
+  dimension Decimal
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  levestock   Livestock @relation(fields: [livestockId], references: [id])
+  livestockId Int
+  lots        Lot[]
+
+  @@map("farms")
+}
+
+model Lot {
+  id        Int       @id @default(autoincrement())
+  name      String
+  purpose   Purpose
+  dimension Decimal
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  farm    Farm     @relation(fields: [farmId], references: [id])
+  farmId  Int
+  animals Animal[]
+
+  @@map("lots")
+}
+
+model Animal {
+  id             Int       @id @default(autoincrement())
+  name           String
+  number         Int
+  urlImg         String?   @map("url_img")
+  description    String?
+  dateOfBirth    DateTime? @map("date_of_birth")
+  dateOfPurchase DateTime? @map("date_of_purchase")
+  purpose        Purpose
+  createdAt      DateTime  @default(now()) @map("created_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  mother          Animal?  @relation("MotherOffspring", fields: [motherId], references: [id])
+  motherId        Int?
+  father          Animal?  @relation("FatherOffspring", fields: [fatherId], references: [id])
+  fatherId        Int?
+  motherOffspring Animal[] @relation("MotherOffspring")
+  fatherOffspring Animal[] @relation("FatherOffspring")
+
+  lot          Lot?          @relation(fields: [lotId], references: [id])
+  lotId        Int?
+  breed        Breed?        @relation(fields: [breedId], references: [id])
+  breedId      Int?
+  gestations   Gestation[]
+  animalEvents AnimalEvent[]
+  vaccinations Vaccination[]
+
+  @@map("animals")
+}
+
+model Breed {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  animals Animal[]
+
+  @@map("breeds")
+}
+
+model Gestation {
+  id              Int             @id @default(autoincrement())
+  startDate       DateTime        @map("start_date")
+  expectedDate    DateTime        @map("expected_date")
+  actualBirthDate DateTime?       @map("actual_birth_date")
+  status          StatusGestation
+  createdAt       DateTime        @default(now()) @map("created_at")
+  deletedAt       DateTime?       @map("deleted_at")
+
+  animal   Animal @relation(fields: [animalId], references: [id])
+  animalId Int
+
+  @@map("gestations")
+}
+
+model AnimalEvent {
+  id       Int    @id @default(autoincrement())
+  animal   Animal @relation(fields: [animalId], references: [id])
+  animalId Int
+  event    Event  @relation(fields: [eventId], references: [id])
+  eventId  Int
+
+  @@map("animal_event")
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  color       String
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime  @map("end_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  animalEvents AnimalEvent[]
+
+  @@map("events")
+}
+
+model Vaccine {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  intervalDays Int       @map("interval_days")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  livestock    Livestock     @relation(fields: [livestockId], references: [id])
+  livestockId  Int
+  vaccinations Vaccination[]
+
+  @@map("vaccines")
+}
+
+model Vaccination {
+  id              Int       @id @default(autoincrement())
+  applicationDate DateTime  @map("application_date")
+  nextDate        DateTime? @map("next_date")
+
+  animal    Animal  @relation(fields: [animalId], references: [id])
+  animalId  Int
+  vaccine   Vaccine @relation(fields: [vaccineId], references: [id])
+  vaccineId Int
+
+  @@map("vaccinations")
+}
