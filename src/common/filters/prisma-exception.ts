@@ -14,130 +14,131 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
     string,
     (exception: Prisma.PrismaClientKnownRequestError) => {
       statusCode: number
-      message: string
+      message: string[]
       error: string
     }
   > = {
-    // Violación de clave única (duplicado)
     P2002: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.CONFLICT,
-      message: `Entrada duplicada detectada en el campo ${exception.meta?.target}`,
+      message: [
+        `Entrada duplicada detectada en el campo ${exception.meta?.target}`,
+      ],
       error: 'Conflicto',
     }),
 
-    // Violación de clave externa
     P2003: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: `Violación de restricción de clave externa en el campo ${exception.meta?.field_name}`,
+      message: [
+        `Violación de restricción de clave externa en el campo ${exception.meta?.field_name}`,
+      ],
       error: 'Clave externa inválida',
     }),
 
-    // El registro solicitado no fue encontrado
     P2025: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.NOT_FOUND,
-      message: `El recurso no fue encontrado para el parámetro de búsqueda en ${exception.meta?.modelName}`,
+      message: [
+        `El recurso no fue encontrado para el parámetro de búsqueda en ${exception.meta?.modelName}`,
+      ],
       error: 'No encontrado',
     }),
 
-    // Registro inexistente
     P2016: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'El registro solicitado no existe en la base de datos',
+      message: ['El registro solicitado no existe en la base de datos'],
       error: 'Registro no encontrado',
     }),
 
-    // Valor null no permitido
     P2011: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Valores null no permitidos en los campos especificados',
+      message: ['Valores null no permitidos en los campos especificados'],
       error: 'Campos no válidos',
     }),
 
-    // Consulta con múltiples resultados cuando se esperaba solo uno
     P2017: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message:
+      message: [
         'La consulta resultó en múltiples registros, cuando se esperaba solo uno',
+      ],
       error: 'Resultado inesperado',
     }),
 
-    // Error de inicialización de la conexión a la base de datos
     P1000: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-      message: 'Autenticación fallida en la base de datos',
+      message: ['Autenticación fallida en la base de datos'],
       error: 'Conexión fallida',
     }),
 
-    // Error de timeout en la base de datos
     P1001: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-      message:
+      message: [
         'No se pudo conectar a la base de datos antes de que se agotara el tiempo de espera',
+      ],
       error: 'Timeout en la conexión',
     }),
 
-    // Error en la URL de conexión a la base de datos
     P1010: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Error en la URL de conexión a la base de datos',
+      message: ['Error en la URL de conexión a la base de datos'],
       error: 'URL de conexión inválida',
     }),
 
-    // Error de rollback (transacción fallida)
     P2036: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'La transacción falló debido a un error inesperado',
+      message: ['La transacción falló debido a un error inesperado'],
       error: 'Error de transacción',
     }),
 
-    // Otros errores conocidos de Prisma (general)
     P2014: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message:
+      message: [
         'La modificación de varias tablas falló debido a una violación de integridad referencial',
+      ],
       error: 'Integridad referencial',
     }),
 
     P2004: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message:
+      message: [
         'Consulta fallida debido a que se encontraron datos incorrectos en la base de datos',
+      ],
       error: 'Datos incorrectos',
     }),
 
     P2005: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: `El valor proporcionado para el campo es inválido`,
+      message: [`El valor proporcionado para el campo es inválido`],
       error: 'Valor no válido',
     }),
 
     P2006: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'El valor proporcionado para un campo específico no es válido',
+      message: ['El valor proporcionado para un campo específico no es válido'],
       error: 'Valor inválido',
     }),
 
     P2007: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Los datos proporcionados son inválidos para esta operación',
+      message: ['Los datos proporcionados son inválidos para esta operación'],
       error: 'Datos inválidos',
     }),
 
     P2008: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'Fallo en la interpretación de la consulta',
+      message: ['Fallo en la interpretación de la consulta'],
       error: 'Error de interpretación',
     }),
 
     P2009: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'La consulta enviada al servidor de base de datos no es válida',
+      message: [
+        'La consulta enviada al servidor de base de datos no es válida',
+      ],
       error: 'Consulta inválida',
     }),
 
     P2012: (exception: Prisma.PrismaClientKnownRequestError) => ({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'La consulta especifica campos mutualmente excluyentes',
+      message: ['La consulta especifica campos mutualmente excluyentes'],
       error: 'Campos no compatibles',
     }),
   }
@@ -159,7 +160,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
     response.status(statusCode).json({
       statusCode,
       error,
-      message: message.slice(),
+      message,
       path: request.url,
       timestamp: new Date(),
     })

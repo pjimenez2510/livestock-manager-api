@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
 import { UserSelectInput } from './constants/user-select'
+import { genSalt, hash } from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -39,6 +40,8 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto, select?: Prisma.UserSelect) {
+    const saltedPassword = await this.generateSaltPassword(data.password)
+    data.password = saltedPassword
     return await this.prisma.user.create({
       data,
       select,
@@ -59,6 +62,10 @@ export class UsersService {
   }
 
   async update(id: number, data: UpdateUserDto, select?: Prisma.UserSelect) {
+    if (data.password) {
+      const saltedPassword = await this.generateSaltPassword(data.password)
+      data.password = saltedPassword
+    }
     return await this.prisma.user.update({
       data,
       where: { id, deletedAt: null },
@@ -72,5 +79,12 @@ export class UsersService {
       where: { id },
     })
     return userDeleted.deletedAt !== null
+  }
+
+  async generateSaltPassword(password: string): Promise<string> {
+    const ROUNDS = 10
+    const SALT = await genSalt(ROUNDS)
+
+    return hash(password, SALT)
   }
 }
