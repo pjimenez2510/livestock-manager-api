@@ -6,16 +6,18 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
-import { CreateUserDto } from '../users/dto/create-user.dto'
 import { compareSync } from 'bcrypt'
 import { TokenResponse } from './dto/token-response.dto'
 import { UsersService } from '../users/users.service'
 import { UserSelectInput } from '../users/constants/user-select'
+import { SignUpDto } from './dto/sign-up.dto'
+import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
+    private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
@@ -35,32 +37,29 @@ export class AuthService {
   }
 
   async signIn(username: string, pass: string) {
-    const user = await this.userService.getUser(
-      { username },
-      { ...UserSelectInput.select, password: true },
-    )
-
+    const user = await this.validateUser(username, pass)
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas')
     }
-
-    if (!this.comparePassword(pass, user.password)) {
-      throw new UnauthorizedException('Credenciales inválidas')
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user
-
     return {
-      access_token: await this.jwtService.signAsync(result),
+      access_token: await this.jwtService.signAsync(user),
+      user: user,
     }
   }
 
-  async signUp(payload: CreateUserDto) {
-    const user = await this.userService.create(payload, UserSelectInput.select)
-    return {
-      access_token: await this.jwtService.signAsync(user),
-    }
+  async signUp(payload: SignUpDto) {
+    return await this.prisma.$transaction(async (tx) => {
+      const livestock = await tx.livestock.create({ data: payload.livestock })
+
+      const user = await tx.user.create({
+        data: { ...payload.user, livestockId: livestock.id },
+        select: UserSelectInput.select,
+      })
+
+      const access_token = await this.jwtService.signAsync(user)
+
+      return { access_token, user }
+    })
   }
 
   async logout(@Req() request: Request): Promise<any> {
