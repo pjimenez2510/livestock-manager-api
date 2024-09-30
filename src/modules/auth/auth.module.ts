@@ -6,10 +6,12 @@ import { AuthService } from './auth.service'
 import { LocalStrategy } from './strategies/local.strategy'
 import { AuthGuard } from './guards/auth.guard'
 import { UsersModule } from '../users/users.module'
+import { PrismaModule } from 'src/prisma/prisma.module'
 
 @Module({
   imports: [
     UsersModule,
+    PrismaModule,
     JwtModule.register({
       global: true,
       secret: `${process.env.JWT_SECRET}`,
