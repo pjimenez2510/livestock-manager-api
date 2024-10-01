@@ -1,8 +1,7 @@
-import { Prisma } from '@prisma/client'
 import { IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class CreateLivestockDto implements Prisma.LivestockCreateInput {
+export class CreateLivestockDto {
   @ApiProperty({
     description: 'Nombre del ganado',
     example: 'Granja Los Álamos',
