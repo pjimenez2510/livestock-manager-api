@@ -1,4 +1,4 @@
-import { Prisma, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import {
   IsEmail,
   IsEnum,
@@ -8,7 +8,7 @@ import {
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
-export class CreateUserDto implements Prisma.UserCreateInput {
+export class CreateUserDto {
   @ApiProperty({
     description: 'Nombre del usuario',
     example: 'Juan',
