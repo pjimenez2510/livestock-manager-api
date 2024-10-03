@@ -1,11 +1,5 @@
 import { Role } from '@prisma/client'
-import {
-  IsEmail,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator'
+import { IsEmail, IsEnum, IsInt, IsString } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 export class CreateUserDto {
@@ -63,7 +57,6 @@ export class CreateUserDto {
     description: 'ID de la ganaderia asociada (opcional)',
     example: 1,
   })
-  @IsNumber({}, { message: 'El ID de la ganadería debe ser un número válido' })
-  @IsOptional()
-  livestockId?: number
+  @IsInt({ message: 'El ID de la ganadería debe ser un número válido' })
+  livestockId: number
 }

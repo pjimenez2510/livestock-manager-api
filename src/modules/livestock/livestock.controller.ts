@@ -12,6 +12,8 @@ import { CreateLivestockDto } from './dto/create-livestock.dto'
 import { UpdateLivestockDto } from './dto/update-livestock.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger'
+import { CurrentUser } from 'src/common/decorators/current-user.decorator'
+import { User } from '@prisma/client'
 
 @ApiTags('Livestock')
 @Controller('livestock')
@@ -27,8 +29,10 @@ export class LivestockController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener lista de todas las ganaderías' })
-  findAll() {
-    return this.livestockService.findAll()
+  findAll(@CurrentUser() user: User) {
+    return this.livestockService.getLivestocks({
+      users: { some: { id: user.id } },
+    })
   }
 
   @Get(':id')
@@ -40,6 +44,7 @@ export class LivestockController {
     type: Number,
   })
   findOne(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -48,7 +53,10 @@ export class LivestockController {
     )
     id: number,
   ) {
-    return this.livestockService.findOne(id)
+    return this.livestockService.getLivestock({
+      id,
+      users: { some: { id: user.id } },
+    })
   }
 
   @Patch(':id')
@@ -61,6 +69,7 @@ export class LivestockController {
   })
   @ApiBody({ type: UpdateLivestockDto })
   update(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -70,7 +79,7 @@ export class LivestockController {
     id: number,
     @Body() updateLivestockDto: UpdateLivestockDto,
   ) {
-    return this.livestockService.update(id, updateLivestockDto)
+    return this.livestockService.update(id, user.id, updateLivestockDto)
   }
 
   @Delete(':id')
@@ -82,6 +91,7 @@ export class LivestockController {
     type: Number,
   })
   remove(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -90,28 +100,6 @@ export class LivestockController {
     )
     id: number,
   ) {
-    return this.livestockService.remove(+id)
-  }
-
-  @Get('user/:id')
-  @ApiOperation({ summary: 'Obtener lista de ganaderías por usuario' })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'El ID del usuario',
-    type: Number,
-  })
-  findByUser(
-    @Param(
-      'id',
-      new ParseIntWithMessagePipe(
-        'El Id de la ganadería debe ser un número valido',
-      ),
-    )
-    id: number,
-  ) {
-    return this.livestockService.getLivestocks({
-      users: { some: { id } },
-    })
+    return this.livestockService.remove(id, user.id)
   }
 }

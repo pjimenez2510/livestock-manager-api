@@ -34,25 +34,21 @@ export class LivestockService {
     })
   }
 
-  async findAll() {
-    return await this.prisma.livestock.findMany()
-  }
-
-  async findOne(id: number) {
-    return await this.getLivestock({ id })
-  }
-
-  async update(id: number, updateLivestockDto: UpdateLivestockDto) {
+  async update(
+    id: number,
+    userId: number,
+    updateLivestockDto: UpdateLivestockDto,
+  ) {
     return await this.prisma.livestock.update({
       data: updateLivestockDto,
-      where: { id },
+      where: { id, users: { some: { id: userId } } },
     })
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
     return await this.prisma.livestock.update({
       data: { deletedAt: new Date() },
-      where: { id },
+      where: { id, users: { some: { id: userId } } },
     })
   }
 }
