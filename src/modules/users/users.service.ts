@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
-import { UserSelectInput } from './constants/user-select'
 import { genSalt, hash } from 'bcrypt'
 
 @Injectable()
@@ -48,35 +47,27 @@ export class UsersService {
     })
   }
 
-  async findAll() {
-    return await this.prisma.user.findMany({
-      where: {
-        deletedAt: null,
-      },
-      select: UserSelectInput.select,
-    })
-  }
-
-  async findId(id: number) {
-    return await this.getUser({ id }, UserSelectInput.select)
-  }
-
-  async update(id: number, data: UpdateUserDto, select?: Prisma.UserSelect) {
+  async update(
+    id: number,
+    livestockId: number,
+    data: UpdateUserDto,
+    select?: Prisma.UserSelect,
+  ) {
     if (data.password) {
       const saltedPassword = await this.generateSaltPassword(data.password)
       data.password = saltedPassword
     }
     return await this.prisma.user.update({
       data,
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, livestockId },
       select,
     })
   }
 
-  async remove(id: number) {
+  async remove(id: number, livestockId: number) {
     const userDeleted = await this.prisma.user.update({
       data: { deletedAt: new Date() },
-      where: { id },
+      where: { id, livestockId },
     })
     return userDeleted.deletedAt !== null
   }

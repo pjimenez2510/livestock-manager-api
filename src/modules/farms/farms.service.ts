@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreateFarmDto } from './dto/create-farm.dto'
 import { UpdateFarmDto } from './dto/update-farm.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
@@ -12,13 +12,17 @@ export class FarmsService {
     where: Prisma.FarmWhereUniqueInput,
     select?: Prisma.FarmSelect,
   ) {
-    return await this.prisma.farm.findUnique({
+    const farm = await this.prisma.farm.findUnique({
       where: {
         ...where,
         deletedAt: null,
       },
       select,
     })
+    if (!farm) {
+      throw new NotFoundException('Finca no encontrada')
+    }
+    return farm
   }
 
   async getFarms(where: Prisma.FarmWhereInput, select?: Prisma.FarmSelect) {
@@ -36,25 +40,17 @@ export class FarmsService {
     })
   }
 
-  async findAll() {
-    return await this.prisma.farm.findMany({ where: { deletedAt: null } })
-  }
-
-  async findOne(id: number) {
-    return await this.getFarm({ id })
-  }
-
-  async update(id: number, updateFarmDto: UpdateFarmDto) {
+  async update(id: number, livestockId: number, updateFarmDto: UpdateFarmDto) {
     return await this.prisma.farm.update({
       data: updateFarmDto,
-      where: { id, deletedAt: null },
+      where: { id, deletedAt: null, livestockId },
     })
   }
 
-  async remove(id: number) {
+  async remove(id: number, livestockId: number) {
     return await this.prisma.farm.update({
       data: { deletedAt: new Date() },
-      where: { id },
+      where: { id, livestockId },
     })
   }
 }

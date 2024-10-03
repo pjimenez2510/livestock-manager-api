@@ -13,6 +13,8 @@ import { CreateFarmDto } from './dto/create-farm.dto'
 import { UpdateFarmDto } from './dto/update-farm.dto'
 import { Farm } from './entities/farm.entity'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
+import { CurrentUser } from 'src/common/decorators/current-user.decorator'
+import { User } from '@prisma/client'
 
 @ApiTags('farms')
 @Controller('farms')
@@ -32,10 +34,14 @@ export class FarmsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all farms' })
-  @ApiResponse({ status: 200, description: 'List of all farms.', type: [Farm] })
-  findAll() {
-    return this.farmsService.findAll()
+  @ApiOperation({ summary: 'Retrieve all farms of the current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all farms of the current user.',
+    type: [Farm],
+  })
+  findAll(@CurrentUser() user: User) {
+    return this.farmsService.getFarms({ livestockId: user.livestockId })
   }
 
   @Get(':id')
@@ -47,6 +53,7 @@ export class FarmsController {
   })
   @ApiResponse({ status: 404, description: 'Farm not found.' })
   findOne(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -55,27 +62,10 @@ export class FarmsController {
     )
     id: number,
   ) {
-    return this.farmsService.findOne(id)
-  }
-
-  @Get('livestock/:id')
-  @ApiOperation({ summary: 'Obtener lista de fincas por ganadería' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all farms that belong to the given livestock.',
-    type: [Farm],
-  })
-  @ApiResponse({ status: 404, description: 'Farm not found.' })
-  findByLivestock(
-    @Param(
-      'id',
-      new ParseIntWithMessagePipe(
-        'El Id de la finca debe ser un número valido',
-      ),
-    )
-    id: number,
-  ) {
-    return this.farmsService.getFarms({ livestockId: id })
+    return this.farmsService.getFarm({
+      id,
+      levestock: { id: user.livestockId },
+    })
   }
 
   @Patch(':id')
@@ -87,6 +77,7 @@ export class FarmsController {
   })
   @ApiResponse({ status: 404, description: 'Farm not found.' })
   update(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -96,7 +87,7 @@ export class FarmsController {
     id: number,
     @Body() updateFarmDto: UpdateFarmDto,
   ) {
-    return this.farmsService.update(id, updateFarmDto)
+    return this.farmsService.update(id, user.livestockId, updateFarmDto)
   }
 
   @Delete(':id')
@@ -107,6 +98,7 @@ export class FarmsController {
   })
   @ApiResponse({ status: 404, description: 'Farm not found.' })
   remove(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -115,6 +107,6 @@ export class FarmsController {
     )
     id: number,
   ) {
-    return this.farmsService.remove(id)
+    return this.farmsService.remove(id, user.livestockId)
   }
 }

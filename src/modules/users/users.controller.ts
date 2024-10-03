@@ -19,6 +19,8 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
 import { UserSelectInput } from './constants/user-select'
+import { User } from '@prisma/client'
+import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 
 @ApiTags('users')
 @Controller('users')
@@ -38,28 +40,16 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todos los usuarios' })
-  @ApiResponse({ status: 200, description: 'Lista de todos los usuarios.' })
-  findAll() {
-    return this.usersService.findAll()
-  }
-
-  @Get(':livestockId')
   @ApiOperation({ summary: 'Obtener todos los usuarios por ganadería' })
   @ApiResponse({
     status: 200,
     description: 'Lista de todos los usuarios que pertenecen a una ganaderia',
   })
-  findByLivestock(
-    @Param(
-      'livestockId',
-      new ParseIntWithMessagePipe(
-        'El Id de la ganadería debe ser un número valido',
-      ),
+  findAll(@CurrentUser() user: User) {
+    return this.usersService.getUsers(
+      { livestockId: user.livestockId },
+      UserSelectInput.select,
     )
-    livestockId: number,
-  ) {
-    return this.usersService.getUsers({ livestockId }, UserSelectInput.select)
   }
 
   @Get(':id')
@@ -68,13 +58,17 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Detalles del usuario encontrado.' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   findOne(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe('El Id del usuario debe ser un numero valio'),
     )
     id: number,
   ) {
-    return this.usersService.findId(+id)
+    return this.usersService.getUser({
+      id,
+      livestock: { id: user.livestockId },
+    })
   }
 
   @Patch(':id')
@@ -84,6 +78,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'El usuario ha sido actualizado.' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   update(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe('El Id del usuario debe ser un numero valio'),
@@ -91,7 +86,12 @@ export class UsersController {
     id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(id, updateUserDto, UserSelectInput.select)
+    return this.usersService.update(
+      id,
+      user.livestockId,
+      updateUserDto,
+      UserSelectInput.select,
+    )
   }
 
   @Delete(':id')
@@ -100,12 +100,13 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'El usuario ha sido eliminado.' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   remove(
+    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe('El Id del usuario debe ser un numero valio'),
     )
     id: number,
   ) {
-    return this.usersService.remove(id)
+    return this.usersService.remove(id, user.livestockId)
   }
 }
