@@ -29,8 +29,8 @@ export class FarmsController {
     type: Farm,
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  create(@Body() createFarmDto: CreateFarmDto) {
-    return this.farmsService.create(createFarmDto)
+  create(@CurrentUser() user: User, @Body() createFarmDto: CreateFarmDto) {
+    return this.farmsService.create(user.livestockId, createFarmDto)
   }
 
   @Get()

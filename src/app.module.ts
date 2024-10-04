@@ -8,7 +8,7 @@ import { FarmsModule } from './modules/farms/farms.module'
 import { LotsModule } from './modules/lots/lots.module'
 
 @Module({
-  imports: [UsersModule, AuthModule, LivestockModule, FarmsModule, LotsModule],
+  imports: [AuthModule, UsersModule, LivestockModule, FarmsModule, LotsModule],
   controllers: [AppController],
   providers: [AppService],
 })
