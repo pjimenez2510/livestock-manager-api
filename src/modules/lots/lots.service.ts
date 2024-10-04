@@ -52,6 +52,9 @@ export class LotsService {
   }
 
   async update(id: number, livestockId: number, data: UpdateLotDto) {
+    if (data.farmId) {
+      await this.validateFarm(data.farmId, livestockId)
+    }
     return await this.prisma.lot.update({
       data,
       where: { id, deletedAt: null, farm: { livestockId } },

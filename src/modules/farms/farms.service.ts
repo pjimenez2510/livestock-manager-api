@@ -3,10 +3,14 @@ import { CreateFarmDto } from './dto/create-farm.dto'
 import { UpdateFarmDto } from './dto/update-farm.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
+import { LivestockService } from '../livestock/livestock.service'
 
 @Injectable()
 export class FarmsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly livestockService: LivestockService,
+  ) {}
 
   async getFarm(
     where: Prisma.FarmWhereUniqueInput,
@@ -34,7 +38,18 @@ export class FarmsService {
     })
   }
 
-  async create(data: CreateFarmDto) {
+  private async validateLivestock(livestockId: number) {
+    const livestock = await this.livestockService.getLivestock({
+      id: livestockId,
+    })
+    if (!livestock) {
+      throw new NotFoundException('Ganadería no encontrada')
+    }
+    return livestock
+  }
+
+  async create(livestockId: number, data: CreateFarmDto) {
+    await this.validateLivestock(livestockId)
     return await this.prisma.farm.create({
       data,
     })
