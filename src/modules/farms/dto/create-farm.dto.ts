@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsNumber, Min } from 'class-validator'
+import { IsString, IsEnum, IsNumber, Min, IsInt } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Purpose } from '@prisma/client'
 
@@ -32,6 +32,6 @@ export class CreateFarmDto {
     description: 'El ID del ganado asociado a la granja',
     example: 42,
   })
-  @IsNumber({}, { message: 'El ID del ganado debe ser un número válido' })
+  @IsInt({ message: 'El ID del ganado debe ser un número válido' })
   livestockId: number
 }
