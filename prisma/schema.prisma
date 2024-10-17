@@ -48,36 +48,19 @@ model User {
   createdAt DateTime  @default(now()) @map("created_at")
   deletedAt DateTime? @map("deleted_at")
 
-  livestock   Livestock? @relation(fields: [livestockId], references: [id])
-  livestockId Int?
-
   @@map("users")
-}
-
-model Livestock {
-  id        Int       @id @default(autoincrement())
-  name      String
-  address   String
-  createdAt DateTime  @default(now()) @map("created_at")
-  deletedAt DateTime? @map("deleted_at")
-  users     User[]
-  farms     Farm[]
-  vaccines  Vaccine[]
-
-  @@map("livestocks")
 }
 
 model Farm {
   id        Int       @id @default(autoincrement())
   name      String
+  address   String
   purpose   Purpose
   dimension Decimal
   createdAt DateTime  @default(now()) @map("created_at")
   deletedAt DateTime? @map("deleted_at")
 
-  levestock   Livestock @relation(fields: [livestockId], references: [id])
-  livestockId Int
-  lots        Lot[]
+  lots Lot[]
 
   @@map("farms")
 }
@@ -187,8 +170,6 @@ model Vaccine {
   createdAt    DateTime  @default(now()) @map("created_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  livestock    Livestock     @relation(fields: [livestockId], references: [id])
-  livestockId  Int
   vaccinations Vaccination[]
 
   @@map("vaccines")

@@ -16,7 +16,7 @@ import { SignInDto } from './dto/sign-in.dto'
 import { ApiOperation, ApiResponse, ApiBody, ApiTags } from '@nestjs/swagger'
 import { AuthGuard } from './guards/auth.guard'
 import { TokenResponse } from './dto/token-response.dto'
-import { SignUpDto } from './dto/sign-up.dto'
+import { CreateUserDto } from '../users/dto/create-user.dto'
 
 @ApiTags('auth')
 @Controller('auth')
@@ -45,9 +45,9 @@ export class AuthController {
     status: 200,
     description: 'El usuario ha sido creado',
   })
-  @ApiBody({ type: SignUpDto })
-  signUp(@Body() signUpDto: SignUpDto) {
-    return this.authService.signUp(signUpDto)
+  @ApiBody({ type: CreateUserDto })
+  signUp(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signUp(createUserDto)
   }
 
   @Public()

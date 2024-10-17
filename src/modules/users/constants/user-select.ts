@@ -10,6 +10,5 @@ export const UserSelectInput: Prisma.UserDefaultArgs = {
     email: true,
     phone: true,
     createdAt: true,
-    livestockId: true,
   },
 }
