@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsNumber, Min } from 'class-validator'
+import { IsString, IsEnum, IsNumber, Min, IsNotEmpty } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Purpose } from '@prisma/client'
 
@@ -8,6 +8,7 @@ export class CreateFarmDto {
     example: 'Sunny Acres',
   })
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'EL nombre es requerido' })
   name: string
 
   @ApiProperty({
@@ -15,6 +16,7 @@ export class CreateFarmDto {
     example: '123 Main St',
   })
   @IsString({ message: 'La direccion debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'La dirección es requerida' })
   address: string
 
   @ApiProperty({
