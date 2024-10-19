@@ -7,37 +7,28 @@ import {
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Response } from 'express'
-
-export interface StandardResponse<T> {
-  status: number
-  data: T
-  metadata: {
-    timestamp: string
-    path: string
-  }
-}
+import { StandarResponse } from '../interfaces/standar-response.interface'
 
 @Injectable()
 export class TransformInterceptor<T>
-  implements NestInterceptor<T, StandardResponse<T>>
+  implements NestInterceptor<T, StandarResponse>
 {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<StandardResponse<T>> {
+  ): Observable<StandarResponse> {
     const ctx = context.switchToHttp()
     const response = ctx.getResponse<Response>()
-    const request = ctx.getRequest<Request>()
 
     return next.handle().pipe(
-      map((data) => ({
-        status: response.statusCode,
-        data: data,
-        metadata: {
-          timestamp: new Date().toISOString(),
-          path: request.url,
-        },
-      })),
+      map((data) => {
+        return {
+          data: data,
+          message: null,
+          error: null,
+          statusCode: response.statusCode,
+        }
+      }),
     )
   }
 }

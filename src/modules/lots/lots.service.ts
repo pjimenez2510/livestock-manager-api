@@ -36,10 +36,12 @@ export class LotsService {
   }
 
   async update(id: number, data: UpdateLotDto) {
-    return await this.prisma.lot.update({
+    const response = await this.prisma.lot.update({
       data,
       where: { id, deletedAt: null },
     })
+
+    return { message: 'Lote actualizado', response }
   }
 
   async remove(id: number) {
