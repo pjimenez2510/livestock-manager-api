@@ -1,10 +1,11 @@
 import { Purpose } from '@prisma/client'
-import { IsString, IsEnum, IsNumber, IsInt } from 'class-validator'
+import { IsString, IsEnum, IsNumber, IsInt, IsNotEmpty } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateLotDto {
   @ApiProperty({ description: 'Nombre del lote' })
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'El nombre es requerido' })
   name: string
 
   @ApiProperty({

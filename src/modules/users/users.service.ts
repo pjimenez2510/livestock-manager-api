@@ -27,12 +27,13 @@ export class UsersService {
   }
 
   async getUsers(
-    userWhereInput: Prisma.UserWhereInput,
+    userWhereInput?: Prisma.UserWhereInput,
     select?: Prisma.UserSelect,
   ) {
     return await this.prisma.user.findMany({
       where: {
         ...userWhereInput,
+        deletedAt: null,
       },
       select,
     })
@@ -47,27 +48,22 @@ export class UsersService {
     })
   }
 
-  async update(
-    id: number,
-    livestockId: number,
-    data: UpdateUserDto,
-    select?: Prisma.UserSelect,
-  ) {
+  async update(id: number, data: UpdateUserDto, select?: Prisma.UserSelect) {
     if (data.password) {
       const saltedPassword = await this.generateSaltPassword(data.password)
       data.password = saltedPassword
     }
     return await this.prisma.user.update({
       data,
-      where: { id, deletedAt: null, livestockId },
+      where: { id, deletedAt: null },
       select,
     })
   }
 
-  async remove(id: number, livestockId: number) {
+  async remove(id: number) {
     const userDeleted = await this.prisma.user.update({
       data: { deletedAt: new Date() },
-      where: { id, livestockId },
+      where: { id, deletedAt: null },
     })
     return userDeleted.deletedAt !== null
   }

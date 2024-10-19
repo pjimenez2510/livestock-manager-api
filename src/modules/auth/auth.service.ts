@@ -9,15 +9,12 @@ import { Request } from 'express'
 import { compareSync } from 'bcrypt'
 import { TokenResponse } from './dto/token-response.dto'
 import { UsersService } from '../users/users.service'
-import { UserSelectInput } from '../users/constants/user-select'
-import { SignUpDto } from './dto/sign-up.dto'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { CreateUserDto } from '../users/dto/create-user.dto'
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
@@ -47,19 +44,10 @@ export class AuthService {
     }
   }
 
-  async signUp(payload: SignUpDto) {
-    return await this.prisma.$transaction(async (tx) => {
-      const livestock = await tx.livestock.create({ data: payload.livestock })
-
-      const user = await tx.user.create({
-        data: { ...payload.user, livestockId: livestock.id },
-        select: UserSelectInput.select,
-      })
-
-      const access_token = await this.jwtService.signAsync(user)
-
-      return { access_token, user }
-    })
+  async signUp(payload: CreateUserDto) {
+    const user = await this.userService.create(payload)
+    const access_token = await this.jwtService.signAsync(user)
+    return { access_token, user }
   }
 
   async logout(@Req() request: Request): Promise<any> {
