@@ -7,13 +7,12 @@ import { Prisma } from '@prisma/client'
 export class LotsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getLot(where: Prisma.LotWhereUniqueInput, select?: Prisma.LotSelect) {
+  async getLot(where: Prisma.LotWhereUniqueInput) {
     const lot = await this.prisma.lot.findUnique({
       where: {
         ...where,
         deletedAt: null,
       },
-      select,
     })
     if (!lot) {
       throw new NotFoundException('Lote no encontrado')
@@ -21,13 +20,12 @@ export class LotsService {
     return lot
   }
 
-  async getLots(where?: Prisma.LotWhereInput, select?: Prisma.LotSelect) {
+  async getLots(where?: Prisma.LotWhereInput) {
     return await this.prisma.lot.findMany({
       where: {
         ...where,
         deletedAt: null,
       },
-      select,
     })
   }
 
