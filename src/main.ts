@@ -19,7 +19,7 @@ async function bootstrap() {
       },
     }),
   )
-
+  app.enableCors({ origin: '*' })
   app.useGlobalFilters(new PrismaClientExceptionFilter())
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalInterceptors(new TransformInterceptor())

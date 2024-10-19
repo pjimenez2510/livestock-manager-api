@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client'
-import { IsEmail, IsEnum, IsInt, IsString } from 'class-validator'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEmail, IsEnum, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateUserDto {
   @ApiProperty({
@@ -52,11 +52,4 @@ export class CreateUserDto {
   })
   @IsString({ message: 'El número de celular debe ser una cadena de texto' })
   phone: string
-
-  @ApiPropertyOptional({
-    description: 'ID de la ganaderia asociada (opcional)',
-    example: 1,
-  })
-  @IsInt({ message: 'El ID de la ganadería debe ser un número válido' })
-  livestockId: number
 }

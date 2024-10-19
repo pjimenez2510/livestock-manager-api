@@ -7,14 +7,17 @@ import {
   Param,
   Delete,
 } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger'
 import { FarmsService } from './farms.service'
 import { CreateFarmDto } from './dto/create-farm.dto'
 import { UpdateFarmDto } from './dto/update-farm.dto'
-import { Farm } from './entities/farm.entity'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
-import { CurrentUser } from 'src/common/decorators/current-user.decorator'
-import { User } from '@prisma/client'
 
 @ApiTags('farms')
 @Controller('farms')
@@ -22,38 +25,22 @@ export class FarmsController {
   constructor(private readonly farmsService: FarmsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new farm' })
-  @ApiResponse({
-    status: 201,
-    description: 'The farm has been successfully created.',
-    type: Farm,
-  })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  create(@CurrentUser() user: User, @Body() createFarmDto: CreateFarmDto) {
-    return this.farmsService.create(user.livestockId, createFarmDto)
+  @ApiOperation({ summary: 'Crear una granja' })
+  @ApiBody({ type: CreateFarmDto })
+  create(@Body() createFarmDto: CreateFarmDto) {
+    return this.farmsService.create(createFarmDto)
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all farms of the current user' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all farms of the current user.',
-    type: [Farm],
-  })
-  findAll(@CurrentUser() user: User) {
-    return this.farmsService.getFarms({ livestockId: user.livestockId })
+  @ApiOperation({ summary: 'Obtener todas las granjas' })
+  findAll() {
+    return this.farmsService.getFarms()
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a farm by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The farm with the given ID.',
-    type: Farm,
-  })
-  @ApiResponse({ status: 404, description: 'Farm not found.' })
+  @ApiOperation({ summary: 'Obtener una granja por id' })
+  @ApiParam({ name: 'id', description: 'Id de la granja', required: true })
   findOne(
-    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -64,20 +51,18 @@ export class FarmsController {
   ) {
     return this.farmsService.getFarm({
       id,
-      levestock: { id: user.livestockId },
     })
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Obtener lista de fincas por usuario' })
+  @ApiParam({ name: 'id', description: 'Id de la granja', required: true })
   @ApiResponse({
     status: 200,
     description: 'The farm has been successfully updated.',
-    type: Farm,
   })
   @ApiResponse({ status: 404, description: 'Farm not found.' })
   update(
-    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -87,18 +72,13 @@ export class FarmsController {
     id: number,
     @Body() updateFarmDto: UpdateFarmDto,
   ) {
-    return this.farmsService.update(id, user.livestockId, updateFarmDto)
+    return this.farmsService.update(id, updateFarmDto)
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove a farm by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The farm has been successfully removed.',
-  })
-  @ApiResponse({ status: 404, description: 'Farm not found.' })
+  @ApiParam({ name: 'id', description: 'Id de la granja', required: true })
   remove(
-    @CurrentUser() user: User,
     @Param(
       'id',
       new ParseIntWithMessagePipe(
@@ -107,6 +87,6 @@ export class FarmsController {
     )
     id: number,
   ) {
-    return this.farmsService.remove(id, user.livestockId)
+    return this.farmsService.remove(id)
   }
 }

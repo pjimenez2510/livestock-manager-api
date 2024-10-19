@@ -4,7 +4,8 @@ import {
   ArgumentsHost,
   HttpException,
 } from '@nestjs/common'
-import { Request, Response } from 'express'
+import { Response } from 'express'
+import { StandarResponse } from '../interfaces/standar-response.interface'
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -45,19 +46,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
-    const request = ctx.getRequest<Request>()
     const status = exception.getStatus()
 
     const errorResponse = exception.getResponse() as any
-    const messages = errorResponse?.message
-    const error = this.typesError[status] || errorResponse?.error
+    const error = errorResponse?.message
+    const message = this.typesError[status] || errorResponse?.error
 
-    response.status(status).json({
+    const responseData = {
       statusCode: status,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-      message: Array.isArray(messages) ? messages : messages.split(),
-      error: error,
-    })
+      error,
+      message,
+      data: null,
+    } as StandarResponse
+
+    response.status(status).json(responseData)
   }
 }
