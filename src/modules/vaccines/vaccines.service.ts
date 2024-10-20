@@ -8,12 +8,16 @@ import { PrismaService } from 'src/prisma/prisma.service'
 export class VaccinesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getVaccine(where: Prisma.VaccineWhereUniqueInput) {
+  async getVaccine(
+    where: Prisma.VaccineWhereUniqueInput,
+    select?: Prisma.VaccineSelect,
+  ) {
     const vaccine = await this.prisma.vaccine.findUnique({
       where: {
         ...where,
         deletedAt: null,
       },
+      select,
     })
     if (!vaccine) {
       throw new Error('Vacuna no encontrada')
@@ -21,28 +25,38 @@ export class VaccinesService {
     return vaccine
   }
 
-  async getVaccines(where?: Prisma.VaccineWhereInput) {
+  async getVaccines(
+    where?: Prisma.VaccineWhereInput,
+    select?: Prisma.VaccineSelect,
+  ) {
     return await this.prisma.vaccine.findMany({
       where: {
         ...where,
         deletedAt: null,
       },
+      select,
     })
   }
 
-  async create(data: CreateVaccineDto) {
+  async create(data: CreateVaccineDto, select?: Prisma.VaccineSelect) {
     return await this.prisma.vaccine.create({
       data,
+      select,
     })
   }
 
-  async update(id: number, data: UpdateVaccineDto) {
+  async update(
+    id: number,
+    data: UpdateVaccineDto,
+    select?: Prisma.VaccineSelect,
+  ) {
     return await this.prisma.vaccine.update({
       data,
       where: {
         id,
         deletedAt: null,
       },
+      select,
     })
   }
 

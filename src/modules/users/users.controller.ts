@@ -14,7 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
 import { UserSelectInput } from './constants/user-select'
 
-@ApiTags('users')
+@ApiTags('Usuarios')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -42,9 +42,12 @@ export class UsersController {
     )
     id: number,
   ) {
-    return this.usersService.getUser({
-      id,
-    })
+    return this.usersService.getUser(
+      {
+        id,
+      },
+      UserSelectInput.select,
+    )
   }
 
   @Patch(':id')

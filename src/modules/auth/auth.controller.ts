@@ -18,7 +18,7 @@ import { AuthGuard } from './guards/auth.guard'
 import { TokenResponse } from './dto/token-response.dto'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 
-@ApiTags('auth')
+@ApiTags('Autenticación')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

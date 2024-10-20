@@ -6,9 +6,17 @@ import { AuthModule } from './modules/auth/auth.module'
 import { FarmsModule } from './modules/farms/farms.module'
 import { LotsModule } from './modules/lots/lots.module'
 import { VaccinesModule } from './modules/vaccines/vaccines.module'
+import { BreedsModule } from './modules/breeds/breeds.module'
 
 @Module({
-  imports: [AuthModule, UsersModule, FarmsModule, LotsModule, VaccinesModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    FarmsModule,
+    LotsModule,
+    VaccinesModule,
+    BreedsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
