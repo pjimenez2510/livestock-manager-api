@@ -12,6 +12,7 @@ import { CreateVaccineDto } from './dto/create-vaccine.dto'
 import { UpdateVaccineDto } from './dto/update-vaccine.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
 import { ApiTags } from '@nestjs/swagger'
+import { VaccineSelectInput } from './constants/vaccine-select'
 
 @ApiTags('Vacunas')
 @Controller('vaccines')
@@ -20,12 +21,15 @@ export class VaccinesController {
 
   @Post()
   create(@Body() createVaccineDto: CreateVaccineDto) {
-    return this.vaccinesService.create(createVaccineDto)
+    return this.vaccinesService.create(
+      createVaccineDto,
+      VaccineSelectInput.select,
+    )
   }
 
   @Get()
   findAll() {
-    return this.vaccinesService.getVaccines()
+    return this.vaccinesService.getVaccines({}, VaccineSelectInput.select)
   }
 
   @Get(':id')
@@ -36,7 +40,7 @@ export class VaccinesController {
     )
     id: number,
   ) {
-    return this.vaccinesService.getVaccine({ id })
+    return this.vaccinesService.getVaccine({ id }, VaccineSelectInput.select)
   }
 
   @Patch(':id')
@@ -48,7 +52,11 @@ export class VaccinesController {
     id: number,
     @Body() updateVaccineDto: UpdateVaccineDto,
   ) {
-    return this.vaccinesService.update(id, updateVaccineDto)
+    return this.vaccinesService.update(
+      id,
+      updateVaccineDto,
+      VaccineSelectInput.select,
+    )
   }
 
   @Delete(':id')

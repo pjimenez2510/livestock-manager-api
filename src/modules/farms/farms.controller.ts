@@ -7,19 +7,14 @@ import {
   Param,
   Delete,
 } from '@nestjs/common'
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-  ApiParam,
-} from '@nestjs/swagger'
+import { ApiTags, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger'
 import { FarmsService } from './farms.service'
 import { CreateFarmDto } from './dto/create-farm.dto'
 import { UpdateFarmDto } from './dto/update-farm.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
+import { FarmSelectInput } from './constants/fram-select'
 
-@ApiTags('farms')
+@ApiTags('Fincas')
 @Controller('farms')
 export class FarmsController {
   constructor(private readonly farmsService: FarmsService) {}
@@ -28,13 +23,13 @@ export class FarmsController {
   @ApiOperation({ summary: 'Crear una granja' })
   @ApiBody({ type: CreateFarmDto })
   create(@Body() createFarmDto: CreateFarmDto) {
-    return this.farmsService.create(createFarmDto)
+    return this.farmsService.create(createFarmDto, FarmSelectInput.select)
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las granjas' })
   findAll() {
-    return this.farmsService.getFarms()
+    return this.farmsService.getFarms({}, FarmSelectInput.select)
   }
 
   @Get(':id')
@@ -49,19 +44,17 @@ export class FarmsController {
     )
     id: number,
   ) {
-    return this.farmsService.getFarm({
-      id,
-    })
+    return this.farmsService.getFarm(
+      {
+        id,
+      },
+      FarmSelectInput.select,
+    )
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Obtener lista de fincas por usuario' })
   @ApiParam({ name: 'id', description: 'Id de la granja', required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'The farm has been successfully updated.',
-  })
-  @ApiResponse({ status: 404, description: 'Farm not found.' })
   update(
     @Param(
       'id',
@@ -72,7 +65,7 @@ export class FarmsController {
     id: number,
     @Body() updateFarmDto: UpdateFarmDto,
   ) {
-    return this.farmsService.update(id, updateFarmDto)
+    return this.farmsService.update(id, updateFarmDto, FarmSelectInput.select)
   }
 
   @Delete(':id')
