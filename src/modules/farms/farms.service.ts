@@ -31,20 +31,26 @@ export class FarmsService {
         ...where,
         deletedAt: null,
       },
+      select: { ...select, deletedAt: false },
+    })
+  }
+
+  async create(data: CreateFarmDto, select?: Prisma.FarmSelect) {
+    return await this.prisma.farm.create({
+      data,
       select,
     })
   }
 
-  async create(data: CreateFarmDto) {
-    return await this.prisma.farm.create({
-      data,
-    })
-  }
-
-  async update(id: number, updateFarmDto: UpdateFarmDto) {
+  async update(
+    id: number,
+    updateFarmDto: UpdateFarmDto,
+    select?: Prisma.FarmSelect,
+  ) {
     return await this.prisma.farm.update({
       data: updateFarmDto,
       where: { id, deletedAt: null },
+      select,
     })
   }
 
