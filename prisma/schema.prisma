@@ -36,6 +36,24 @@ enum StatusEvent {
   CANCELED
 }
 
+enum StatusAnimal {
+  ALIVE
+  SOLD
+  DECEASED
+  LOST
+}
+
+enum AnimalSex {
+  MALE
+  FEMALE
+}
+
+enum IntervalType {
+  DAY
+  MONTH
+  YEAR
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   firstName String    @map("first_name")
@@ -81,16 +99,18 @@ model Lot {
 }
 
 model Animal {
-  id             Int       @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   name           String
-  number         Int
-  urlImg         String?   @map("url_img")
+  number         String
+  urlImg         String?      @map("url_img")
   description    String?
-  dateOfBirth    DateTime? @map("date_of_birth")
-  dateOfPurchase DateTime? @map("date_of_purchase")
+  dateOfBirth    DateTime?    @map("date_of_birth")
+  dateOfPurchase DateTime?    @map("date_of_purchase")
   purpose        Purpose
-  createdAt      DateTime  @default(now()) @map("created_at")
-  deletedAt      DateTime? @map("deleted_at")
+  status         StatusAnimal @default(ALIVE)
+  sex            AnimalSex
+  createdAt      DateTime     @default(now()) @map("created_at")
+  deletedAt      DateTime?    @map("deleted_at")
 
   mother          Animal?  @relation("MotherOffspring", fields: [motherId], references: [id])
   motherId        Int?
@@ -163,12 +183,13 @@ model Event {
 }
 
 model Vaccine {
-  id           Int       @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   name         String
   description  String?
-  intervalDays Int       @default(0) @map("interval_days")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  deletedAt    DateTime? @map("deleted_at")
+  intervalDays Int          @default(0) @map("interval_days")
+  intervalType IntervalType @default(DAY) @map("interval_type")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  deletedAt    DateTime?    @map("deleted_at")
 
   vaccinations Vaccination[]
 
