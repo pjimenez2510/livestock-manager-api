@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger'
 import { LotsService } from './lots.service'
@@ -13,6 +14,7 @@ import { CreateLotDto } from './dto/create-lot.dto'
 import { UpdateLotDto } from './dto/update-lot.dto'
 import { ParseIntWithMessagePipe } from 'src/common/pipes/parse-int-with-message'
 import { LotSelectInput } from './constants/lot-select'
+import { FilterLotDto } from './dto/filter-lot.dto'
 @ApiTags('Lotes')
 @Controller('lots')
 export class LotsController {
@@ -27,8 +29,8 @@ export class LotsController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los lotes' })
-  findAll() {
-    return this.lotsService.getLots({}, LotSelectInput.select)
+  findAll(@Query() filterParams: FilterLotDto) {
+    return this.lotsService.getLots(filterParams, LotSelectInput.select)
   }
 
   @Get(':id')
