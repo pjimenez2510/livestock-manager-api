@@ -55,16 +55,17 @@ enum IntervalType {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  firstName String    @map("first_name")
-  lastName  String    @map("last_name")
-  username  String    @unique
-  password  String
-  role      Role
-  email     String
-  phone     String
-  createdAt DateTime  @default(now()) @map("created_at")
-  deletedAt DateTime? @map("deleted_at")
+  id           Int            @id @default(autoincrement())
+  firstName    String         @map("first_name")
+  lastName     String         @map("last_name")
+  username     String         @unique
+  password     String
+  role         Role
+  email        String
+  phone        String
+  createdAt    DateTime       @default(now()) @map("created_at")
+  deletedAt    DateTime?      @map("deleted_at")
+  Subscription Subscription[]
 
   @@map("users")
 }
@@ -103,6 +104,7 @@ model Animal {
   name           String
   number         String
   urlImg         String?      @map("url_img")
+  imagePublicId  String?      @map("image_public_id")
   description    String?
   dateOfBirth    DateTime?    @map("date_of_birth")
   dateOfPurchase DateTime?    @map("date_of_purchase")
@@ -207,4 +209,16 @@ model Vaccination {
   vaccineId Int
 
   @@map("vaccinations")
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  available Boolean  @default(true)
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@map("subscriptions")
 }
