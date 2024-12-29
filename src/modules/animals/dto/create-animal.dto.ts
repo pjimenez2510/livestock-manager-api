@@ -26,16 +26,6 @@ export class CreateAnimalDto {
   number: string
 
   @ApiProperty({
-    description: 'URL de la imagen del animal',
-    example: 'https://example.com/image.jpg',
-  })
-  @IsOptional()
-  @IsString({
-    message: 'La URL de la imagen del animal debe ser una cadena de texto',
-  })
-  urlImg?: string
-
-  @ApiProperty({
     description: 'Descripción del animal',
     example: 'Una pequeña perra',
   })
@@ -129,4 +119,8 @@ export class CreateAnimalDto {
   @IsOptional()
   @IsNumber({}, { message: 'El Id del lote del animal debe ser un número' })
   lotId?: number
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
+  image?: Express.Multer.File
 }

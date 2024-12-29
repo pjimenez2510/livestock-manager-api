@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { CreateVaccineDto } from './dto/create-vaccine.dto'
 import { UpdateVaccineDto } from './dto/update-vaccine.dto'
 import { Prisma } from '@prisma/client'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from 'src/modules/prisma/prisma.service'
 
 @Injectable()
 export class VaccinesService {

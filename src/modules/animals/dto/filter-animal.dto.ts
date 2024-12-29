@@ -16,6 +16,14 @@ export class FilterAnimalDto {
     required: false,
   })
   @IsOptional()
+  @IsString({ message: 'El filtro debe ser una cadena de texto' })
+  filter?: string
+
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
   name?: string
 
