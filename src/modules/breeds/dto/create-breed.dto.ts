@@ -13,5 +13,5 @@ export class CreateBreedDto {
   })
   @IsString({ message: 'La descripción debe ser una cadena de texto' })
   @IsOptional()
-  description: string
+  description?: string
 }

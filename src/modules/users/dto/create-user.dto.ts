@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import { IsEmail, IsEnum, IsString } from 'class-validator'
+import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateUserDto {
@@ -8,6 +8,7 @@ export class CreateUserDto {
     example: 'Juan',
   })
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
+  @MinLength(1, { message: 'EL nombre es requerido' })
   firstName: string
 
   @ApiProperty({
@@ -15,6 +16,7 @@ export class CreateUserDto {
     example: 'Pérez',
   })
   @IsString({ message: 'El apellido debe ser una cadena de texto' })
+  @MinLength(1, { message: 'EL apellido es requerido' })
   lastName: string
 
   @ApiProperty({
@@ -22,6 +24,9 @@ export class CreateUserDto {
     example: 'juan.perez',
   })
   @IsString({ message: 'El nombre de usuario debe ser una cadena de texto' })
+  @MinLength(5, {
+    message: 'EL nombre de usuario debe tener mínimo 5 carácteres',
+  })
   username: string
 
   @ApiProperty({
@@ -29,6 +34,9 @@ export class CreateUserDto {
     example: 'password123',
   })
   @IsString({ message: 'La contraseña debe ser una cadena de texto' })
+  @MinLength(6, {
+    message: 'La contraseña debe tener mínimo 6 carácteres',
+  })
   password: string
 
   @ApiProperty({

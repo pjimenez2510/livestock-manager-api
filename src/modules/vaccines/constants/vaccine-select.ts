@@ -6,6 +6,7 @@ export const VaccineSelectInput: Prisma.VaccineDefaultArgs = {
     name: true,
     description: true,
     intervalDays: true,
+    intervalType: true,
     createdAt: true,
   },
 }
