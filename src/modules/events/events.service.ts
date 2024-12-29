@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { CreateEventDto } from './dto/create-event.dto'
 import { UpdateEventDto } from './dto/update-event.dto'
 import { PrismaService } from 'src/modules/prisma/prisma.service'
@@ -8,6 +12,12 @@ import { Prisma } from '@prisma/client'
 export class EventsService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createEventDto: CreateEventDto, select?: Prisma.EventSelect) {
+    if (createEventDto.startDate >= createEventDto.endDate) {
+      throw new BadRequestException(
+        'La fecha de inicio debe ser menor a la fecha de fin',
+      )
+    }
+
     return await this.prisma.event.create({
       data: createEventDto,
       select,
